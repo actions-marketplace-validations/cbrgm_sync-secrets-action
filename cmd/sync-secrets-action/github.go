@@ -5,8 +5,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/cenkalti/backoff/v5"
-	"github.com/google/go-github/v82/github"
+	"github.com/cenkalti/backoff/v7"
+	"github.com/google/go-github/v89/github"
 	"golang.org/x/oauth2"
 )
 
@@ -26,7 +26,10 @@ type GitHubActionClient interface {
 func NewGitHubAPI(ctx context.Context, token string, maxRetries int, rateLimitCheckEnabled, dryRunEnabled bool) GitHubActionClient {
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
 	tc := oauth2.NewClient(ctx, ts)
-	client := github.NewClient(tc)
+	client, err := github.NewClient(github.WithHTTPClient(tc))
+	if err != nil {
+		log.Fatalf("Failed to create GitHub client: %v", err)
+	}
 
 	apiClient := newGitHubAPI(client, dryRunEnabled)
 	apiClient = newRetryableGitHubAPI(apiClient, uint64(maxRetries))

@@ -92,7 +92,11 @@ $(BIN)/$(EXECUTABLE)-debug: $(SOURCES)
 	$(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -gcflags '$(GCFLAGS)' -o $@ ./cmd/$(NAME)
 
 .PHONY: release
-release: $(DIST) release-linux release-darwin release-windows
+release: $(DIST) release-linux release-darwin release-windows release-checksum
+
+.PHONY: release-checksum
+release-checksum:
+	cd $(DIST); $(foreach file,$(wildcard $(DIST)/$(EXECUTABLE)_*),sha256sum $(notdir $(file)) > $(notdir $(file)).sha256;)
 
 $(DIST):
 	mkdir -p $(DIST)
@@ -104,11 +108,7 @@ release-linux: $(DIST) \
 	$(DIST)/$(EXECUTABLE)_linux-arm-5 \
 	$(DIST)/$(EXECUTABLE)_linux-arm-6 \
 	$(DIST)/$(EXECUTABLE)_linux-arm-7 \
-	$(DIST)/$(EXECUTABLE)_linux-arm64 \
-	$(DIST)/$(EXECUTABLE)_linux-mips \
-	$(DIST)/$(EXECUTABLE)_linux-mips64 \
-	$(DIST)/$(EXECUTABLE)_linux-mipsle \
-	$(DIST)/$(EXECUTABLE)_linux-mips64le
+	$(DIST)/$(EXECUTABLE)_linux-arm64
 
 $(DIST)/$(EXECUTABLE)_linux-386:
 	GOOS=linux GOARCH=386 $(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -o $@ ./cmd/$(NAME)
@@ -128,17 +128,6 @@ $(DIST)/$(EXECUTABLE)_linux-arm-7:
 $(DIST)/$(EXECUTABLE)_linux-arm64:
 	GOOS=linux GOARCH=arm64 $(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -o $@ ./cmd/$(NAME)
 
-$(DIST)/$(EXECUTABLE)_linux-mips:
-	GOOS=linux GOARCH=mips $(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -o $@ ./cmd/$(NAME)
-
-$(DIST)/$(EXECUTABLE)_linux-mips64:
-	GOOS=linux GOARCH=mips64 $(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -o $@ ./cmd/$(NAME)
-
-$(DIST)/$(EXECUTABLE)_linux-mipsle:
-	GOOS=linux GOARCH=mipsle $(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -o $@ ./cmd/$(NAME)
-
-$(DIST)/$(EXECUTABLE)_linux-mips64le:
-	GOOS=linux GOARCH=mips64le $(GOBUILD) -v -tags '$(TAGS)' -ldflags '$(LDFLAGS)' -o $@ ./cmd/$(NAME)
 
 .PHONY: release-darwin
 release-darwin: $(DIST) \
