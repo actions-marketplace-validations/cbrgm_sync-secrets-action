@@ -1,11 +1,11 @@
 module github.com/cbrgm/sync-secrets-action
 
-go 1.25.0
+go 1.26.5
 
 require (
 	github.com/alexflint/go-arg v1.6.1
-	github.com/google/go-github/v89 v89.0.0
-	golang.org/x/crypto v0.54.0
+	github.com/google/go-github/v90 v90.0.0
+	golang.org/x/crypto v0.55.0
 	golang.org/x/oauth2 v0.36.0
 )
 
